@@ -1,6 +1,7 @@
+//Project Package
 package com.company;
 
-// Client2 class that
+// Client class that
 // sends data and receives also
 
 import java.io.*;
@@ -13,16 +14,20 @@ class Client {
 
         // Create client socket
         s = new Socket("localhost", 888);
+
         System.out.println("Connection established");
 
-        //Connection Block
+        //Connection Execution Block
         {
+            //Starting Thread for Receiving Messages
             ServerMessages sm = new ServerMessages();
             sm.start();
 
+            //Starting Thread for Sending Messages
             SendMessages snm = new SendMessages();
             snm.start();
 
+            //Wait till connection is Closed
             while(s.isConnected()){}
         }
 
@@ -32,6 +37,8 @@ class Client {
     }
 }
 
+//ServerMessage Class to
+//receive messages from Server
 class ServerMessages extends Thread{
     public void run(){
         try{
@@ -43,7 +50,9 @@ class ServerMessages extends Thread{
                     new InputStreamReader(
                             Client.s.getInputStream()));
 
-            // receive from the server
+            // receive from the server till
+            // Server sends null
+            // or connection is closed
             while(((str1 = br.readLine()) != null) && Client.s.isConnected()) {
                 System.out.println(str1);
             }
@@ -60,10 +69,13 @@ class ServerMessages extends Thread{
     }
 }
 
+//SendMessages Class to
+//send Messages to Server
 class SendMessages extends Thread{
     public void run(){
         try{
             String str;
+
             // to send data to the server
             DataOutputStream dos
                     = new DataOutputStream(
@@ -76,6 +88,7 @@ class SendMessages extends Thread{
 
             // repeat as long as exit
             // is not typed at client
+            // or connection is closed
             while ((!(str = kb.readLine()).equals("exit")) && Client.s.isConnected()) {
                 // send to the server
                 dos.writeBytes(str + "\n");

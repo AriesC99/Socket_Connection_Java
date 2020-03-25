@@ -1,6 +1,7 @@
+//Project Package
 package com.company;
 
-// Server2 class that
+// Server class that
 // receives data and sends data
 
 import java.io.*;
@@ -11,6 +12,7 @@ class Server {
     public static void main(String args[]) throws Exception
     {
         System.out.println("Waiting for Client Connection !!!");
+
         // Create server Socket
         ServerSocket ss = new ServerSocket(888);
 
@@ -19,10 +21,9 @@ class Server {
         System.out.println("Connection established");
 
         // server executes continuously
-        //Communication Block
+        //Communication Execution Block
        {
             //Starting Thread to Receive Messages
-
             ClientMessages cm = new ClientMessages();
             cm. start();
 
@@ -30,11 +31,12 @@ class Server {
             SendMessages sm = new SendMessages();
             sm.start();
 
+           //Wait till connection is Closed
            while(s.isConnected()){}
 
         }
 
-        // close connection
+        // close Server connection
         ss.close();
 
         // terminate application
@@ -42,6 +44,8 @@ class Server {
     }
 }
 
+//ClientMessage Class to
+//receive messages from Client
 class ClientMessages extends  Thread{
     public void run(){
         try {
@@ -53,7 +57,9 @@ class ClientMessages extends  Thread{
                     new InputStreamReader(
                             Server.s.getInputStream()));
 
-            //Receive Messages till client Sends null
+            //Receive Messages till
+            // client Sends null
+            // or Connection is closed
             while (((str = br.readLine()) != null) && Server.s.isConnected()) {
                 System.out.println(str);
             }
@@ -71,7 +77,8 @@ class ClientMessages extends  Thread{
     }
 }
 
-
+//SendMessages Class to
+//send Messages to Client
 class SendMessages extends Thread{
     public void run(){
         String str1;
@@ -85,7 +92,9 @@ class SendMessages extends Thread{
                     = new BufferedReader(
                     new InputStreamReader(System.in));
 
-            //Send Messages
+            //Send Messages as long as
+            //Server sends exit
+            //or Connection is closed
             while((!(str1 = kb.readLine()).equals("exit")) && Server.s.isConnected()) {
                 // send to client
                 ps.println(str1);
